@@ -1,0 +1,97 @@
+<html>
+<script charset="utf-8"
+        src="https://cdn.ethers.io/scripts/ethers-v4.min.js"
+        type="text/javascript">
+</script>
+
+<script  src="../js/init.js">
+</script>
+<script  src="../js/bounty.js">
+</script>
+<script  src="../js/multi.js">
+</script>
+<script>
+</script>
+<script>
+initializeCreator(web3)
+</script>
+<body>
+
+
+  <hr>
+
+  <h5>token details</h5>
+
+  <label id="balanceLabel">BALANCE: </label><br>
+  <label id="approvedLabel">Approved: </label><br>
+
+  <input id="approveAmount" placeholder = "amount..."></input><button onclick="approve()">Approve</button>
+  <hr>
+  <h5> CREATE </h5>
+
+<input id="bountyName" placeholder="bounty name..."></input> <br>
+<input id="bountyDescription" placeholder="description..."></input> <br>
+<input id="bountyNum" type="number" placeholder="number of bounties..."></input> <br>
+<input id="bountyAmount" placeholder="bounty amount..."></input> <br>
+<input id="timeIntervalInput" placeholder="deadline..." ></input>
+<select id="timeframeSelect">
+  <option value="1">seconds</option>
+  <option value="60">minutes</option>
+  <option value="3600">hours</option>
+  <option value="86400">days</option>
+  <option value="604600">weeks</option>
+</select> <br>
+<button onclick = "create()">Create</button>
+
+<br><br>
+
+
+
+<hr>
+
+<h5> MANAGE </h5>
+
+<select id="BountySelect" onchange="updateCreatorManager()">
+
+</select>
+<br><br>
+
+<h6> BOUNTIES </h6>
+
+
+<label id="creatorLabel">Creator:</label> <br>
+<label id="nameLabel">Name:</label> <br>
+<label id="descriptionLabel">Description:</label> <br>
+<label id="amountLabel">Amount:</label> <br>
+<label id="remainingLabel">Num Bounties:</label> <br>
+<label id="deadlineLabel">Deadline:</label> <br>
+<input placeholder="amount..." id="contributeAmount"></input><button onclick="contribute()">Contribute</button> <br><br><br>
+
+<h6> SUBMISSIONS </h6>
+
+<select id="submissionSelect" onchange="updateSubmissionManager()"></select><br>
+<label id="hunterLabel">Hunter:</label> <br>
+<label id="submissionLabel">Submission:</label> <br>
+<button onclick="reward()">Approve:</button> <br>
+
+<hr>
+<h5> HISTORY </h5>
+<table id="historyTable" >
+  							<thead>
+  								<tr>
+										<th>Hunter</th>
+  									<th>Name</th>
+  									<th>Description</th>
+  									<th>Amount</th>
+  									<th>Submission</th>
+  									<th>Status</th>
+  								</tr>
+  							</thead>
+
+  							<tbody>
+
+  							</tbody>
+  						</table>
+  					</div>
+</body>
+</html>
