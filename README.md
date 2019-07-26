@@ -1,4 +1,4 @@
-this is the DevCash pre Initial Bounty Offering! 
+This is the DevCash pre Initial Bounty Offering! 
 
 The pre-IBO prepares us for IBO launch. 
 
