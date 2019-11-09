@@ -14,55 +14,32 @@ initializeHunter(web3)
 </script>
 <body>
 
+  <h3>DevCash Balance</h3>
+
+  <label id="balanceLabel">Balance: </label><br>
+  <label id="approvedLabel">Approved: </label><br><br>
 
   <hr>
 
-  <h5>token details</h5>
+<h5> Personal Bounties </h5>
 
-  <label id="balanceLabel">BALANCE: </label><br>
-  <hr>
-<!-- <select>
-  <option value="volvo">Volvo</option>
-  <option value="saab">Saab</option>
-  <option value="mercedes">Mercedes</option>
-  <option value="audi">Audi</option>
-</select> -->
+<table>
+  <thead>
+    <th>Creator</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Amount</th>
+    <th>Submission</th>
+    <th>Deadline</th>
+    <th>Submission</th>
+    <th>Submit</th>
+  </thead>
+  <tbody id="HunterTable">
+  </tbody>
+</table>
+
 
 <hr>
-
-<h5> HUNT </h5>
-
-<select id="BountySelect" onchange="updateHunterManager()">
-
-</select>
-<br><br>
-
-<label id="creatorLabel">Creator:</label> <br>
-<label id="nameLabel">Name:</label> <br>
-<label id="descriptionLabel">Description:</label> <br>
-<label id="amountLabel">Amount:</label> <br>
-<label id="submissionLabel">Submission:</label> <br>
-<label id="deadlineLabel">Deadline:</label> <br>
-<input placeholder="submission..." id="submission"></input><button onclick="submit()">Submit:</button> <br>
-<hr>
-<h5> HISTORY </h5>
-<table id="historyTable" >
-  							<thead>
-  								<tr>
-										<th>Hunter</th>
-  									<th>Name</th>
-  									<th>Description</th>
-  									<th>Amount</th>
-  									<th>Submission</th>
-  									<th>Status</th>
-  								</tr>
-  							</thead>
-
-  							<tbody>
-
-  							</tbody>
-  						</table>
-  					</div>
 
 
 </body>

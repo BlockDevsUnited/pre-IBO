@@ -11,29 +11,43 @@ var timeFrame = e.options[e.selectedIndex].value;
   let time = document.getElementById("timeIntervalInput").value*timeFrame;
   console.log(name,description,numBounties,time,amount)
 
-  await uBCContract.createMultiBounty(name,description,time,amount,numBounties,overrides)
+  await uBCContract.createMultiBounty(name,description,numBounties,amount)
 }
 
 
 function updateCreatorManager(){
   console.log("updateCreatorManager")
   var bountyId = document.getElementById("BountySelect").value
-
   if (bountyId==""){return}
-  console.log(multiBounties)
-  document.getElementById("creatorLabel").innerHTML = "Creator: " + multiBounties[bountyId].creator
-  document.getElementById("nameLabel").innerHTML = "Name: " + multiBounties[bountyId].name
-  document.getElementById("descriptionLabel").innerHTML = "Description: " + multiBounties[bountyId].description
-  document.getElementById("amountLabel").innerHTML = "Amount: " + multiBounties[bountyId].amount + " " + tokenSymbol
-  document.getElementById("remainingLabel").innerHTML = "Num Left: " + multiBounties[bountyId].remaining
-  document.getElementById("deadlineLabel").innerHTML = "Deadline: " + multiBounties[bountyId].deadline
+
+  let creatorLink = document.createElement("a")
+  let creatorLabel = document.getElementById("creatorLabel")
+  creatorLabel.innerHTML = "Creator: "
+  let creatorAddress = creatorList[ubounties[bountyId].creatorIndex]
+  creatorLink.innerText = creatorAddress
+  creatorLink.href = "https://ropsten.etherscan.io/address/" + creatorAddress
+  creatorLabel.appendChild(creatorLink)
+
+  document.getElementById("amountLabel").innerHTML = "Amount: "
+
+  document.getElementById("nameLabel").innerHTML = "Name: " + ubounties[bountyId].name
+  document.getElementById("descriptionLabel").innerHTML = "Description: " + ubounties[bountyId].description
+  document.getElementById("amountLabel").appendChild(bountyBalances[bountyId])
+  document.getElementById("remaining").innerHTML = "Remaining: " + ubounties[bountyId].numLeft
+
+  //document.getElementById("submissionLabel").innerHTML = "Submission: " + ubounties[bountyId].submissionStrings[ubounties[bountyId].numSubmissions-1]
+  document.getElementById("deadlineLabel").innerHTML = "Deadline: none"
+
   populateSubmissionsSelect(bountyId);
   updateSubmissionManager(bountyId)
+
+
 
 
 }
 
 function updateSubmissionManager(){
+  console.log("updateSubmissionManager")
   var bountyId = document.getElementById("BountySelect").value
   console.log(multiBounties[bountyId].sumbissions.length)
   if(multiBounties[bountyId].sumbissions.length==0){return}
@@ -60,9 +74,10 @@ function updateHunterManager() {
 
 function populateCreatorSelect(){
   console.log("populateCreatorSelect Multi")
-  for (let j = 0; j<multiBounties.length;j++){
-    if(multiBounties[j].creator==signer._address && multiBounties[j].active==true){
+  for (let j = 1; j<ubounties.length;j++){
+    if(creatorList[ubounties[j].creatorIndex]==signer._address && ubounties[j].hunterIndex==0 && ubounties[j].numLeft!=0){
       var opt = document.createElement("option");
+      console.log(j)
      opt.value= j;
      opt.innerHTML = j; // whatever property it has
 
@@ -89,10 +104,8 @@ function populateHunterSelect(){
 
 function populateSubmissionsSelect(bountyId) {
   console.log("populateSubmissionsSelect")
-  console.log(bountyId)
-  let sumbissions = multiBounties[bountyId].sumbissions;
+  let sumbissions = ubounties[bountyId].submissionStrings;
   let numSubmissions = sumbissions.length;
-  console.log(numSubmissions)
   for (let j = 0;j<numSubmissions;j++){
     let s = sumbissions[j]
     if(s.active){

@@ -1,0 +1,75 @@
+<html>
+<script charset="utf-8"
+        src="https://cdn.ethers.io/scripts/ethers-v4.min.js"
+        type="text/javascript">
+</script>
+
+<script  src="../js/init.js">
+</script>
+<script  src="../js/dex.js">
+</script>
+
+<script>
+initializeDEX(web3)
+</script>
+<body>
+
+  <h1>DevCash DEX</h1>
+  <label>WARNING: DevCash DEX is in beta and security of funds is not absolutely guaranteed. Trade at own risk</label>
+
+    <br><br><hr>
+
+  <h3>DevCash Balance</h3>
+
+  <label id="balanceLabel">Balance: </label><br>
+  <label id="approvedLabel">Approved: </label><br><br>
+
+  <input id="approveAmount" placeholder = "amount..."></input><button onclick="approveDEX()">Approve</button><br><br>
+  <hr>
+
+<h3>Buy</h3>
+
+<label>price: </label><select id="buyLevels" name="price">
+
+</select> <br>
+
+<input  id="buyAmount" placeholder="amount"></input><br>
+<button onclick="buy()">Buy</button>
+
+<br><br><hr>
+
+<h3>Sell</h3>
+
+<label>price: </label><select id="sellLevels" name="price">
+
+</select><br>
+<input id="sellAmount" placeholder="amount"></input><br>
+<button  onclick="sell()">Sell</button>
+<br><br><hr>
+<h3>Orders</h3>
+<table>
+<thead>
+  <th>Price</th>
+  <th>Buys</th>
+  <th>Sells</th>
+  <th>Address</th>
+</thead>
+<tbody id="OLTable">
+</tbody>
+</table>
+<br><hr>
+
+<h3>Trade History</h3>
+
+<table id=trades>
+  <tr>
+    <th>Date</th>
+    <th>Price</th>
+    <th>DevCash</th>
+    <th>Ether</th>
+    <th>Type</th>
+  </tr>
+</table>
+
+</body>
+</html>
