@@ -7,7 +7,7 @@ let hunterList
 let bCList
 let bountyBalances
 
-let tokenAddress = "0x0fca8Fdb0FB115A33BAadEc6e7A141FFC1bC7d5a"//"0xD021315678991ee801655C75101986200f0a011D"////;
+let tokenAddress = "0xae177B1aD79A832C1f73C5eb613F26b5C043d39c"//"0xD021315678991ee801655C75101986200f0a011D"////;
 let tokenABI = [
 	{
 		"constant": true,
@@ -280,7 +280,7 @@ let tokenABI = [
 let tokenContract;
 
 //uBountyCreator
-let uBCAddress = "0x842aDd92A8b919303eCa575d13b67EC69eD2Ef5B"//"0x8F205DBF6409d692CA302a13C69039e905984dDa"//"0x1b111DB39178adC3Facf848f524dE18E0Ae427dE"
+let uBCAddress = "0x8F205DBF6409d692CA302a13C69039e905984dDa"//"0x1b111DB39178adC3Facf848f524dE18E0Ae427dE"
 let uBCABI = [
 	{
 		"constant": false,
@@ -1063,7 +1063,7 @@ let orderbookABI = [
 		"type": "function"
 	}
 ]
-let orderbookAddress = "0x993bCd0Cd7fC77b80cFba3778A22f0A1Ac1Da5dD"//"0x363F60A48D0eAFFa565AD8F6E4AB9c5Ac56C6CbC"//""//
+let orderbookAddress = "0x93E02CA2f33Be662e7F8dCA9231fE2BDF0037776"//"0x363F60A48D0eAFFa565AD8F6E4AB9c5Ac56C6CbC"//""//
 let orderbookContract
 
 let OLABI = [

@@ -23,9 +23,13 @@ contract orderLevel {
     uint public rW; //wei remainder (out of d)
 
     address public token;
+    address public ob; //orderbook address
+
+    uint public totalTokensOnSale;
+    address public admin;
 
     struct order{
-        address payable trader;
+        uint traderIndex;
         uint amount;
     }
 
@@ -37,74 +41,141 @@ contract orderLevel {
         n = _n;
         d = _d;
         token = _token;
+        ob = msg.sender;
+        admin = tx.origin;
+        maxLoops = 100;
     }
 
     function () external payable{
-        _buy(msg.sender,msg.value);
+        uint traderIndex = orderbook(ob).getTraderIndex(msg.sender);
+        _buy(traderIndex,msg.value);
     }
 
     function buy () public payable{
-        _buy(msg.sender,msg.value);
+        uint traderIndex = orderbook(ob).getTraderIndex(msg.sender);
+        _buy(traderIndex,msg.value);
     }
 
-    function _buy(address payable buyer, uint amountWei) internal {
-        amountWei += rW;
-        uint amountTokens = amountWei*d/n;
-        rW = amountWei-(amountTokens*n/d);
+    function _buy(uint buyerIndex, uint amountWei) internal {
+        address payable buyer = orderbook(ob).getTrader(buyerIndex);
 
-        uint tokenBalance = tokenBalance();
+        uint amountTokens = amountWei*d + rT;
+        rT = amountTokens%n;
+        amountTokens = amountTokens/n;
 
-        if(tokenBalance<d){
-            orders.push(order(buyer,amountTokens));
-        } else {
-            while(o!=orders.length && amountWei>orders[o].amount){
-                amountWei-= orders[o].amount;
-                orders[o].trader.transfer(orders[o].amount);
+        if(totalTokensOnSale*n<d){
+            amountTokens-=totalTokensOnSale;
+            transferTokens(buyer,totalTokensOnSale);
+            totalTokensOnSale = 0;
+            pushOrder(buyerIndex,amountTokens);
+        } else if(amountTokens>0) {
+            address payable trader;
+            uint loops;
+            uint WeiSold;
+            while(o!=orders.length && amountWei>=WeiSold+orders[o].amount && loops<maxLoops){
+                WeiSold += orders[o].amount;
+                trader = orderbook(ob).getTrader(orders[o].traderIndex);
+                trader.transfer(orders[o].amount);
                 o++;
+                loops++;
             }
+            amountWei-= WeiSold;
+            if(o==orders.length){
+                transferTokens(buyer,tokenBalance());
+                amountTokens -= totalTokensOnSale;
+                totalTokensOnSale=0;
+                delete orders;
+                o=0;
+                pushOrder(buyerIndex,amountTokens);
+            } else if (loops==maxLoops){
+                uint originalAmountTokens = amountTokens*n + rT;
 
-            if(tokenBalance>amountTokens+d){
-                ERC20(token).transfer(buyer,amountTokens);
-                orders[o].trader.transfer(amountWei-rW);
-                orders[o].amount-=amountWei;
-            } else {
-                ERC20(token).transfer(buyer,tokenBalance); rT=0;
-                uint tokenOrderAmount = amountTokens-tokenBalance;
-                delete orders; o=0; orders.push(order(buyer,tokenOrderAmount));
+                amountTokens = originalAmountTokens-amountWei*d;
+                rT = amountTokens%n;
+                amountTokens = amountTokens/n;
+
+                transferTokens(buyer,amountTokens);
+                totalTokensOnSale-=amountTokens;
+                buyer.transfer(amountWei);
+
+            } else{
+                transferTokens(buyer,amountTokens);
+                totalTokensOnSale-=amountTokens;
+                trader = orderbook(ob).getTrader(orders[o].traderIndex);
+                trader.transfer(amountWei);
+                orders[o].amount-=(amountWei);
             }
         }
     }
 
-    function sell(uint amountTokens) public {
+    function sell(uint sellerIndex, uint amountTokens) public {
+        require(msg.sender==ob || msg.sender==address(this),"not called by orderbook contract");
 
-        address payable seller = msg.sender;
-        ERC20(token).transferFrom(msg.sender,address(this),amountTokens);
+        address payable seller = orderbook(ob).getTrader(sellerIndex);
 
-        amountTokens += rT;
-        uint amountWei = amountTokens*n/d;
-        rT = amountTokens-(amountWei*d/n);
+        uint amountWei = amountTokens*n + rW;
+        rW = amountWei%d;
+        amountWei = amountWei/d;
 
         uint weiBalance = weiBalance();
 
-        if (weiBalance<n){
-            orders.push(order(seller,amountWei));
-        } else {
-            while(o != orders.length  && amountTokens>orders[o].amount){
-                amountTokens-= orders[o].amount;
-                ERC20(token).transfer(orders[o].trader,orders[o].amount);
+        if (weiBalance*d<n){
+            seller.transfer(weiBalance);
+            amountWei-=weiBalance;
+            pushOrder(sellerIndex,amountWei);
+            totalTokensOnSale+=amountTokens;
+        } else if (amountWei>0){
+            address payable trader;
+            uint loops;
+            uint TokensSold;
+            while(o != orders.length  && amountTokens>=TokensSold+orders[o].amount && loops<maxLoops){
+                TokensSold += orders[o].amount;
+                trader = orderbook(ob).getTrader(orders[o].traderIndex);
+                transferTokens(trader,orders[o].amount);
                 o++;
+                loops++;
             }
-            if (weiBalance>=amountWei+n){
+            amountTokens -= TokensSold;
+            if (orders.length==o){
+                seller.transfer(weiBalance);
+                amountWei-= weiBalance;
+                delete orders;
+                o=0;
+                totalTokensOnSale += amountTokens;
+                pushOrder(sellerIndex,amountWei);
+            } else if (loops==maxLoops){
+                uint originalAmountWei = amountWei*d + rW;
+
+                amountWei = originalAmountWei-amountTokens*n;
+                rW = amountWei%d;
+                amountWei = amountWei/d;
+
                 seller.transfer(amountWei);
-                ERC20(token).transfer(orders[o].trader,amountTokens-rT);
-                orders[o].amount -= amountTokens;
+                transferTokens(seller,amountTokens);
 
             } else {
-                seller.transfer(weiBalance); rW=0;
-                uint weiOrderAmount = amountWei - weiBalance;
-                delete orders; o=0; orders.push(order(seller,weiOrderAmount));
+                seller.transfer(amountWei);
+                trader = orderbook(ob).getTrader(orders[o].traderIndex);
+                transferTokens(trader,amountTokens);
+                orders[o].amount -= (amountTokens);
             }
         }
+    }
+
+    function pushOrder(uint sellerIndex, uint amount) internal{
+        if(amount>0){
+            orders.push(order(sellerIndex,amount));
+        }
+    }
+
+    function transferTokens(address recipient,uint amountTokens) internal{
+        if(amountTokens>0){
+            ERC20(token).transfer(recipient,amountTokens);
+        }
+    }
+
+    function orderLength() public view returns (uint){
+        return orders.length;
     }
 
     function tokenBalance() public view returns (uint){
@@ -114,20 +185,62 @@ contract orderLevel {
     function weiBalance() public view returns (uint){
         return address(this).balance;
     }
+
+    function returnExtraTokens() public {
+        ERC20(token).transfer(admin,tokenBalance()-totalTokensOnSale);
+    }
+
+    uint public maxLoops;
+    function setMaxLoops(uint _maxLoops) public {
+        require(msg.sender==ob);
+        maxLoops= _maxLoops;
+    }
+
+
 }
 
 contract orderbook{
     address public admin;
-    address[] public orderLevels;
-    address public token = 0xD021315678991ee801655C75101986200f0a011D;
+    mapping(uint=>address payable) public orderLevels;
+    uint public numOrderLevels;
+
+    address public token = 0xae177B1aD79A832C1f73C5eb613F26b5C043d39c;
 
     constructor() public {
-        admin == msg.sender;
+        admin = msg.sender;
+        traderList.push(address(0));
+    }
+
+    mapping (address=>uint) public traders;
+    address payable[] public traderList;
+
+    function getTrader(uint traderIndex) public view returns (address payable){
+        return traderList[traderIndex];
+    }
+
+    function getTraderIndex(address payable trader) public returns(uint){
+        if(traders[trader]==0){
+            traders[trader] = traderList.length;
+            traderList.push(trader);
+        }
+        return traders[trader];
+    }
+
+    function sell(uint ol,uint amountTokens) public {
+        ERC20(token).transferFrom(msg.sender,orderLevels[ol],amountTokens);
+        uint traderIndex = getTraderIndex(msg.sender);
+        orderLevel(orderLevels[ol]).sell(traderIndex,amountTokens);
     }
 
     function addOrderLevel(uint n, uint d) public {
         require(admin==msg.sender);
         orderLevel oL = new orderLevel(n,d,token);
-        orderLevels.push(address(oL));
+        orderLevels[numOrderLevels] = address(oL);
+        numOrderLevels++;
+    }
+
+    function setMaxLoops(uint ol, uint _maxLoops) public{
+        require(admin==msg.sender);
+        orderLevel(orderLevels[ol]).setMaxLoops(_maxLoops);
     }
 }
