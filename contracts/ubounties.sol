@@ -20,7 +20,7 @@ contract ERC20Approve {
 
 contract bountyChest{
     constructor () public {
-        ERC20Approve(0xD021315678991ee801655C75101986200f0a011D).approve(msg.sender,2**256-1);
+        ERC20Approve(0x0fca8Fdb0FB115A33BAadEc6e7A141FFC1bC7d5a).approve(msg.sender,2**256-1);
     }
 }
 
@@ -31,9 +31,9 @@ contract ubountyCreator{
     event rewarded(uint uBountyIndex, uint submissionIndex);
     event reclaimed(uint uBountyIndex);
 
-    address public devcash = 0xD021315678991ee801655C75101986200f0a011D;
+    address public devcash = 0x0fca8Fdb0FB115A33BAadEc6e7A141FFC1bC7d5a;
     address public admin;
-    uint fee = 10000000;
+    uint public fee = 10000000;
 
     struct submission{
         uint32 submitterIndex;
@@ -60,6 +60,10 @@ contract ubountyCreator{
 
     function getSubmissionHash(uint ubountyIndex, uint submissionIndex) public view returns(bytes32) {
         return ubounties[ubountyIndex].submissions[submissionIndex].submissionHash;
+    }
+
+    function getSubmitter(uint ubountyIndex, uint submissionIndex) public view returns(uint){
+        return ubounties[ubountyIndex].submissions[submissionIndex].submitterIndex;
     }
 
     mapping(address=>uint32) bountyChests;
@@ -103,7 +107,8 @@ contract ubountyCreator{
         uint8 numLeft,
         bytes32 infoHash,
         address hunter,
-        uint amount) public {
+        uint amount,
+        uint48 deadline) public {
 
             if (creators[msg.sender]==0){
                 creators[msg.sender] = uint32(creatorList.length);
@@ -131,7 +136,11 @@ contract ubountyCreator{
             ubounties[numUbounties].numLeft = numLeft;
             ubounties[numUbounties].infoHash = infoHash;
             ubounties[numUbounties].bountyChestIndex = bountyChests[bCAddress];
-            ubounties[numUbounties].deadline = 2**48-1;
+            if(deadline==0){
+                ubounties[numUbounties].deadline = 2**48-1;
+            } else {
+               ubounties[numUbounties].deadline = deadline;
+            }
 
             ERC20(devcash).transferFrom(msg.sender,bCAddress,amount);
             ERC20(devcash).transferFrom(msg.sender,admin,fee);
@@ -142,7 +151,8 @@ contract ubountyCreator{
         string memory name,
         string memory description,
         address hunter,
-        uint amount
+        uint amount,
+        uint48 deadline
         ) public{
 
             if (creators[msg.sender]==0){
@@ -172,7 +182,11 @@ contract ubountyCreator{
             ubounties[numUbounties].name = name;
             ubounties[numUbounties].description = description;
             ubounties[numUbounties].bountyChestIndex = bountyChests[bCAddress];
-            ubounties[numUbounties].deadline = 2**48-1;
+            if(deadline==0){
+                ubounties[numUbounties].deadline = 2**48-1;
+            } else {
+               ubounties[numUbounties].deadline = deadline;
+            }
 
             ERC20(devcash).transferFrom(msg.sender,bCAddress,amount);
             ERC20(devcash).transferFrom(msg.sender,admin,fee);
@@ -183,7 +197,8 @@ contract ubountyCreator{
         string memory name,
         string memory description,
         uint8 numLeft,
-        uint amount
+        uint amount,
+        uint48 deadline
         ) public{
 
             if (creators[msg.sender]==0){
@@ -207,7 +222,11 @@ contract ubountyCreator{
             ubounties[numUbounties].name = name;
             ubounties[numUbounties].description = description;
             ubounties[numUbounties].bountyChestIndex = bountyChests[bCAddress];
-            ubounties[numUbounties].deadline = 2**48-1;
+            if(deadline==0){
+                ubounties[numUbounties].deadline = 2**48-1;
+            } else {
+               ubounties[numUbounties].deadline = deadline;
+            }
 
             ERC20(devcash).transferFrom(msg.sender,bCAddress,amount);
             ERC20(devcash).transferFrom(msg.sender,admin,fee);
@@ -265,7 +284,7 @@ contract ubountyCreator{
     }
 
     function reclaim(uint ubountyIndex) public {
-        require(creators[msg.sender]==ubounties[ubountyIndex].creatorIndex);
+        require(creators[msg.sender]==ubounties[ubountyIndex].creatorIndex,"You are not the bounty creator");
         require(now>ubounties[ubountyIndex].deadline||ubounties[ubountyIndex].deadline==2**48-1,"The bounty deadline has not yet elapsed");
         require(ubounties[ubountyIndex].bountyChestIndex!=0,"This bounty is inactive");
 

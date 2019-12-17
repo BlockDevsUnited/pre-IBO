@@ -204,7 +204,7 @@ contract orderbook{
     mapping(uint=>address payable) public orderLevels;
     uint public numOrderLevels;
 
-    address public token = 0xd0479a5174A474B0d0F7709DbFCD210fe2B39143;
+    address public token = 0x0fca8Fdb0FB115A33BAadEc6e7A141FFC1bC7d5a;
 
     constructor() public {
         admin = msg.sender;
