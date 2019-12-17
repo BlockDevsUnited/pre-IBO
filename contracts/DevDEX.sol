@@ -72,7 +72,7 @@ contract orderLevel {
             address payable trader;
             uint loops;
             uint WeiSold;
-            while(o!=orders.length && amountWei>=WeiSold+orders[o].amount && loops<maxLoops){
+            while(o!=orders.length && loops<maxLoops && amountWei>=WeiSold+orders[o].amount){
                 WeiSold += orders[o].amount;
                 trader = orderbook(ob).getTrader(orders[o].traderIndex);
                 trader.transfer(orders[o].amount);
@@ -81,12 +81,12 @@ contract orderLevel {
             }
             amountWei-= WeiSold;
             if(o==orders.length){
-                transferTokens(buyer,tokenBalance());
                 amountTokens -= totalTokensOnSale;
+                transferTokens(buyer,totalTokensOnSale);
                 totalTokensOnSale=0;
+                pushOrder(buyerIndex,amountTokens);
                 delete orders;
                 o=0;
-                pushOrder(buyerIndex,amountTokens);
             } else if (loops==maxLoops){
                 uint originalAmountTokens = amountTokens*n + rT;
 
@@ -103,7 +103,7 @@ contract orderLevel {
                 totalTokensOnSale-=amountTokens;
                 trader = orderbook(ob).getTrader(orders[o].traderIndex);
                 trader.transfer(amountWei);
-                orders[o].amount-=(amountWei);
+                orders[o].amount-=amountWei;
             }
         }
     }
@@ -204,7 +204,7 @@ contract orderbook{
     mapping(uint=>address payable) public orderLevels;
     uint public numOrderLevels;
 
-    address public token = 0xae177B1aD79A832C1f73C5eb613F26b5C043d39c;
+    address public token = 0xd0479a5174A474B0d0F7709DbFCD210fe2B39143;
 
     constructor() public {
         admin = msg.sender;

@@ -32,8 +32,8 @@ function updateCreatorManager(){
 
   document.getElementById("nameLabel").innerHTML = "Name: " + ubounties[bountyId].name
   document.getElementById("descriptionLabel").innerHTML = "Description: " + ubounties[bountyId].description
-  document.getElementById("amountLabel").appendChild(bountyBalances[bountyId])
-  document.getElementById("remaining").innerHTML = "Remaining: " + ubounties[bountyId].numLeft
+  document.getElementById("amountLabel").innerHTML = bountyBalances[bountyId]
+  document.getElementById("remainingLabel").innerHTML = "Remaining: " + ubounties[bountyId].numLeft
 
   //document.getElementById("submissionLabel").innerHTML = "Submission: " + ubounties[bountyId].submissionStrings[ubounties[bountyId].numSubmissions-1]
   document.getElementById("deadlineLabel").innerHTML = "Deadline: none"
@@ -47,29 +47,97 @@ function updateCreatorManager(){
 }
 
 function updateSubmissionManager(){
-  console.log("updateSubmissionManager")
   var bountyId = document.getElementById("BountySelect").value
-  console.log(multiBounties[bountyId].sumbissions.length)
-  if(multiBounties[bountyId].sumbissions.length==0){return}
+  if(ubounties[bountyId].numBounties==0){return}
   var submissionId = document.getElementById("submissionSelect").value
-  document.getElementById("hunterLabel").innerHTML = "Hunter: " + multiBounties[bountyId].sumbissions[submissionId].hunter
-  document.getElementById("submissionLabel").innerHTML = "Submission: " + multiBounties[bountyId].sumbissions[submissionId].submission
+  console.log(bountyId)
+  console.log(submissionId)
+  document.getElementById("hunterLabel").innerHTML = "Hunter: " + ubounties[bountyId].submissions[submissionId].submitter
+  document.getElementById("submissionLabel").innerHTML = "Submission: " + ubounties[bountyId].submissions[submissionId].submissionString
 
 }
 
 function updateHunterManager() {
   console.log("updateHunterManager")
+  let HunterTable = document.getElementById("HunterTable")
+  HunterTable.innerHTML = ""
+  for (let j = 1; j<ubounties.length;j++){
+    if(ubounties[j].numLeft>0&&ubounties[j].hunterIndex==0){
+      console.log(j)
 
-  var bountyId = document.getElementById("BountySelect").value
-  if (bountyId==""){return}
 
-  document.getElementById("creatorLabel").innerHTML = "Creator: " + multiBounties[bountyId].creator
-  document.getElementById("nameLabel").innerHTML = "Name: " + multiBounties[bountyId].name
-  document.getElementById("descriptionLabel").innerHTML = "Description: " + multiBounties[bountyId].description
-  document.getElementById("amountLabel").innerHTML = "Amount: " + multiBounties[bountyId].amount + " " + tokenSymbol
-  document.getElementById("remainingLabel").innerHTML = "Num Left: " + multiBounties[bountyId].remaining
-  document.getElementById("deadlineLabel").innerHTML = "Deadline: " + multiBounties[bountyId].deadline
 
+
+      let row=document.createElement("tr");
+      cell1 = document.createElement("td");
+      cell2 = document.createElement("td");
+      cell3 = document.createElement("td");
+      cell4 = document.createElement("td");
+      cell5 = document.createElement("td");
+      cell6 = document.createElement("td");
+      cell7 = document.createElement("td");
+      cell8 = document.createElement("td");
+
+      let creator = creatorList[ubounties[j].creatorIndex]
+      let name = ubounties[j].name
+      let description = ubounties[j].description
+      console.log(ubounties[j].bountyChestIndex)
+      let amount = bountyBalances[ubounties[j].bountyChestIndex]
+      let submission
+      if(ubounties[j].numSubmissions>0){
+        submission = ubounties[j].submissions[ubounties[j].numSubmissions-1].submissionString
+      } else {
+        submission = "none"
+      }
+      let deadline = "none"
+
+      let submissionInput = document.createElement("input")
+      submissionInput.placeholder = "submission..."
+
+      let submitButton = document.createElement("input")
+      submitButton.type="button"
+      submitButton.value = "submit"
+      submitButton.onclick = function () {
+                submitString(j-1,submissionInput.value)
+            };
+
+           textnode1=document.createTextNode(creator);
+           textnode2=document.createTextNode(name);
+           textnode3=document.createTextNode(description);
+           textnode5=document.createTextNode(submission);
+           textnode6=document.createTextNode(deadline);
+
+           cell1.appendChild(textnode1);
+           cell2.appendChild(textnode2);
+           cell3.appendChild(textnode3);
+           cell4.appendChild(amount);
+           cell5.appendChild(textnode5);
+           cell6.appendChild(textnode6);
+           cell7.appendChild(submissionInput);
+           cell8.appendChild(submitButton);
+
+          //  console.log(textnode1);
+          // console.log(textnode2);
+          //  console.log(textnode3);
+          //  console.log(amount);
+          //  console.log(textnode5);
+          //  console.log(textnode6);
+          //  console.log(submissionInput);
+          //  console.log(submitButton);
+
+           row.appendChild(cell1);
+           row.appendChild(cell2);
+           row.appendChild(cell3);
+           row.appendChild(cell4);
+           row.appendChild(cell5);
+           row.appendChild(cell6);
+           row.appendChild(cell7);
+           row.appendChild(cell8);
+
+           console.log(row)
+           HunterTable.appendChild(row);
+    }
+  }
 }
 
 function populateCreatorSelect(){
@@ -104,14 +172,13 @@ function populateHunterSelect(){
 
 function populateSubmissionsSelect(bountyId) {
   console.log("populateSubmissionsSelect")
-  let sumbissions = ubounties[bountyId].submissionStrings;
-  let numSubmissions = sumbissions.length;
+  let submissions = ubounties[bountyId].submissions;
+  let numSubmissions = ubounties[bountyId].numSubmissions;
   for (let j = 0;j<numSubmissions;j++){
-    let s = sumbissions[j]
-    if(s.active){
-      let hunter = s.hunter;
+    let s = submissions[j]
+
+      let submitter = s.submitter;
       let submission = s.submission
-      console.log(hunter,submission)
 
       var opt = document.createElement("option");
       opt.value= j;
@@ -119,7 +186,7 @@ function populateSubmissionsSelect(bountyId) {
 
       // then append it to the select element
       document.getElementById("submissionSelect").appendChild(opt);
-    }
+
     console.log(j)
   }
 }
@@ -144,9 +211,11 @@ async function submit() {
 }
 
 async function reward(){
-  let bountyId = document.getElementById("BountySelect").value;
+  let bountyId = document.getElementById("BountySelect").value-1;
   let sId = document.getElementById("submissionSelect").value
-  let bountyAddress = await uBCContract.multiBounties(bountyId)
-  let bountyContract = new ethers.Contract(bountyAddress,mABI,signer)
-  await bountyContract.reward(sId)
+  await uBCContract.reward(bountyId,sId,overrides);
+}
+
+async function submitString(ubountyIndex,submissionString){
+  await uBCContract.submitString(ubountyIndex,submissionString)
 }

@@ -39,20 +39,21 @@ document.getElementById("amountLabel").innerHTML = "Amount: "
   document.getElementById("nameLabel").innerHTML = "Name: " + ubounties[bountyId].name
   document.getElementById("descriptionLabel").innerHTML = "Description: " + ubounties[bountyId].description
   document.getElementById("amountLabel").appendChild(bountyBalances[bountyId])
-  document.getElementById("submissionLabel").innerHTML = "Submission: " + ubounties[bountyId].submissions[ubounties[bountyId].numSubmissions-1][1]
+  document.getElementById("submissionLabel").innerHTML = "Submission: " + ubounties[bountyId].submissions[ubounties[bountyId].numSubmissions-1].submissionString
   document.getElementById("deadlineLabel").innerHTML = "Deadline: none"
 }
 
 function updateHunterManager() {
   console.log("updateHunterManager")
-
+  let HunterTable = document.getElementById("HunterTable")
+  HunterTable.innerHTML = ""
   for (let j = 1; j<ubounties.length;j++){
+    console.log(j)
     if(hunterList[ubounties[j].hunterIndex]==signer._address&&ubounties[j].numLeft>0){
       console.log(j)
 
 
-    let HunterTable = document.getElementById("HunterTable")
-    HunterTable.innerHTML = ""
+
 
       let row=document.createElement("tr");
       cell1 = document.createElement("td");
@@ -67,8 +68,13 @@ function updateHunterManager() {
       let creator = creatorList[ubounties[j].creatorIndex]
       let name = ubounties[j].name
       let description = ubounties[j].description
-      let amount = bountyBalances[j]
-      let submission = ubounties[j].submissions[ubounties[j].numSubmissions-1][1]
+      let amount = bountyBalances[ubounties[j].bountyChestIndex]
+      let submission
+      if(ubounties[j].numSubmissions>0){
+        submission = ubounties[j].submissions[ubounties[j].numSubmissions-1].submissionString
+      } else {
+        submission = "none"
+      }
       let deadline = "none"
 
       let submissionInput = document.createElement("input")
