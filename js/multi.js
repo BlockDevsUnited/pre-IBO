@@ -11,7 +11,7 @@ var timeFrame = e.options[e.selectedIndex].value;
   let time = document.getElementById("timeIntervalInput").value*timeFrame;
   console.log(name,description,numBounties,time,amount)
 
-  await uBCContract.createMultiBounty(name,description,numBounties,amount)
+  await uBCContract.createMultiBounty(name,description,numBounties,amount,0)
 }
 
 
@@ -25,7 +25,7 @@ function updateCreatorManager(){
   creatorLabel.innerHTML = "Creator: "
   let creatorAddress = creatorList[ubounties[bountyId].creatorIndex]
   creatorLink.innerText = creatorAddress
-  creatorLink.href = "https://ropsten.etherscan.io/address/" + creatorAddress
+  creatorLink.href = "https://etherscan.io/address/" + creatorAddress
   creatorLabel.appendChild(creatorLink)
 
   document.getElementById("amountLabel").innerHTML = "Amount: "
@@ -76,19 +76,12 @@ function updateHunterManager() {
       cell5 = document.createElement("td");
       cell6 = document.createElement("td");
       cell7 = document.createElement("td");
-      cell8 = document.createElement("td");
 
       let creator = creatorList[ubounties[j].creatorIndex]
       let name = ubounties[j].name
       let description = ubounties[j].description
       console.log(ubounties[j].bountyChestIndex)
       let amount = bountyBalances[ubounties[j].bountyChestIndex]
-      let submission
-      if(ubounties[j].numSubmissions>0){
-        submission = ubounties[j].submissions[ubounties[j].numSubmissions-1].submissionString
-      } else {
-        submission = "none"
-      }
       let deadline = "none"
 
       let submissionInput = document.createElement("input")
@@ -104,17 +97,15 @@ function updateHunterManager() {
            textnode1=document.createTextNode(creator);
            textnode2=document.createTextNode(name);
            textnode3=document.createTextNode(description);
-           textnode5=document.createTextNode(submission);
-           textnode6=document.createTextNode(deadline);
+           textnode4=document.createTextNode(deadline);
 
            cell1.appendChild(textnode1);
            cell2.appendChild(textnode2);
            cell3.appendChild(textnode3);
            cell4.appendChild(amount);
-           cell5.appendChild(textnode5);
-           cell6.appendChild(textnode6);
-           cell7.appendChild(submissionInput);
-           cell8.appendChild(submitButton);
+           cell5.appendChild(textnode4);
+           cell6.appendChild(submissionInput);
+           cell7.appendChild(submitButton);
 
           //  console.log(textnode1);
           // console.log(textnode2);
@@ -132,7 +123,6 @@ function updateHunterManager() {
            row.appendChild(cell5);
            row.appendChild(cell6);
            row.appendChild(cell7);
-           row.appendChild(cell8);
 
            console.log(row)
            HunterTable.appendChild(row);
@@ -213,7 +203,7 @@ async function submit() {
 async function reward(){
   let bountyId = document.getElementById("BountySelect").value-1;
   let sId = document.getElementById("submissionSelect").value
-  await uBCContract.reward(bountyId,sId,overrides);
+  await uBCContract.reward(bountyId,sId);
 }
 
 async function submitString(ubountyIndex,submissionString){

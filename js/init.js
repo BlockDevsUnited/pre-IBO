@@ -6,6 +6,7 @@ let creatorList
 let hunterList
 let bCList
 let bountyBalances
+let bCToNumLeft
 
 let tokenAddress = "0x0fca8Fdb0FB115A33BAadEc6e7A141FFC1bC7d5a"//"0xD021315678991ee801655C75101986200f0a011D"////;
 let tokenABI = [
@@ -283,9 +284,349 @@ let tokenContract;
 let uBCAddress = "0xab3A3f3Df683513De7d060a045A01a13b811F422"//"0x1b111DB39178adC3Facf848f524dE18E0Ae427dE"
 let uBCABI = [
 	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "uBountyIndex",
+				"type": "uint256"
+			}
+		],
+		"name": "created",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "uBountyIndex",
+				"type": "uint256"
+			}
+		],
+		"name": "reclaimed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "uBountyIndex",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "submissionIndex",
+				"type": "uint256"
+			}
+		],
+		"name": "rewarded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "uBountyIndex",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "submissionIndex",
+				"type": "uint256"
+			}
+		],
+		"name": "submitted",
+		"type": "event"
+	},
+	{
 		"constant": true,
 		"inputs": [],
-		"name": "numBC",
+		"name": "admin",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "arbitratorList",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "arbitrators",
+		"outputs": [
+			{
+				"internalType": "uint32",
+				"name": "",
+				"type": "uint32"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "bCList",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "ubountyIndex",
+				"type": "uint256"
+			}
+		],
+		"name": "bountyAmount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "createBountyChest",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numLeft",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint48",
+				"name": "deadline",
+				"type": "uint48"
+			}
+		],
+		"name": "createMultiBounty",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "hunter",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint48",
+				"name": "deadline",
+				"type": "uint48"
+			}
+		],
+		"name": "createSingleBounty",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint8",
+				"name": "numLeft",
+				"type": "uint8"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "infoHash",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "address",
+				"name": "hunter",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint48",
+				"name": "deadline",
+				"type": "uint48"
+			}
+		],
+		"name": "createUbounty",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "creatorList",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "creators",
+		"outputs": [
+			{
+				"internalType": "uint32",
+				"name": "",
+				"type": "uint32"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "devcash",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "fee",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -332,6 +673,32 @@ let uBCABI = [
 				"type": "uint256"
 			}
 		],
+		"name": "getSubmissionHash",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "ubountyIndex",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "submissionIndex",
+				"type": "uint256"
+			}
+		],
 		"name": "getSubmissionString",
 		"outputs": [
 			{
@@ -342,93 +709,6 @@ let uBCABI = [
 		],
 		"payable": false,
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "creatorList",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint8",
-				"name": "numLeft",
-				"type": "uint8"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "infoHash",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "address",
-				"name": "hunter",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "createUbounty",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ubountyIndex",
-				"type": "uint256"
-			}
-		],
-		"name": "bountyAmount",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ubountyIndex",
-				"type": "uint256"
-			}
-		],
-		"name": "reclaim",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -455,342 +735,6 @@ let uBCABI = [
 		],
 		"payable": false,
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "arbitrators",
-		"outputs": [
-			{
-				"internalType": "uint32",
-				"name": "",
-				"type": "uint32"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "ubounties",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "numLeft",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint8",
-				"name": "numSubmissions",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint32",
-				"name": "hunterIndex",
-				"type": "uint32"
-			},
-			{
-				"internalType": "uint32",
-				"name": "creatorIndex",
-				"type": "uint32"
-			},
-			{
-				"internalType": "uint32",
-				"name": "bountyChestIndex",
-				"type": "uint32"
-			},
-			{
-				"internalType": "uint48",
-				"name": "deadline",
-				"type": "uint48"
-			},
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "infoHash",
-				"type": "bytes32"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "address",
-				"name": "hunter",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "createSingleBounty",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_fee",
-				"type": "uint256"
-			}
-		],
-		"name": "setFee",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "numHunters",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ubountyIndex",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "submissionString",
-				"type": "string"
-			}
-		],
-		"name": "submitString",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "bCList",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "uint8",
-				"name": "numLeft",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "createMultiBounty",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ubountyIndex",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "submissionHash",
-				"type": "bytes32"
-			}
-		],
-		"name": "submitHash",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "creators",
-		"outputs": [
-			{
-				"internalType": "uint32",
-				"name": "",
-				"type": "uint32"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ubountyIndex",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "submissionIndex",
-				"type": "uint256"
-			}
-		],
-		"name": "getSubmissionHash",
-		"outputs": [
-			{
-				"internalType": "bytes32",
-				"name": "",
-				"type": "bytes32"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "numUbounties",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "arbitratorList",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ubountyIndex",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "submissionIndex",
-				"type": "uint256"
-			}
-		],
-		"name": "reward",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -853,51 +797,12 @@ let uBCABI = [
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "fee",
+		"name": "numBC",
 		"outputs": [
 			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "devcash",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "createBountyChest",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "admin",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
 			}
 		],
 		"payable": false,
@@ -920,74 +825,185 @@ let uBCABI = [
 		"type": "function"
 	},
 	{
+		"constant": true,
 		"inputs": [],
+		"name": "numHunters",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "numUbounties",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "ubountyIndex",
+				"type": "uint256"
+			}
+		],
+		"name": "reclaim",
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
-		"type": "constructor"
+		"type": "function"
 	},
 	{
-		"anonymous": false,
+		"constant": false,
 		"inputs": [
 			{
-				"indexed": false,
 				"internalType": "uint256",
-				"name": "uBountyIndex",
-				"type": "uint256"
-			}
-		],
-		"name": "created",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "uBountyIndex",
+				"name": "ubountyIndex",
 				"type": "uint256"
 			},
 			{
-				"indexed": false,
 				"internalType": "uint256",
 				"name": "submissionIndex",
 				"type": "uint256"
 			}
 		],
-		"name": "submitted",
-		"type": "event"
+		"name": "reward",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
-		"anonymous": false,
+		"constant": false,
 		"inputs": [
 			{
-				"indexed": false,
 				"internalType": "uint256",
-				"name": "uBountyIndex",
+				"name": "_fee",
+				"type": "uint256"
+			}
+		],
+		"name": "setFee",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "ubountyIndex",
 				"type": "uint256"
 			},
 			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "submissionIndex",
-				"type": "uint256"
+				"internalType": "bytes32",
+				"name": "submissionHash",
+				"type": "bytes32"
 			}
 		],
-		"name": "rewarded",
-		"type": "event"
+		"name": "submitHash",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
-		"anonymous": false,
+		"constant": false,
 		"inputs": [
 			{
-				"indexed": false,
 				"internalType": "uint256",
-				"name": "uBountyIndex",
+				"name": "ubountyIndex",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "submissionString",
+				"type": "string"
+			}
+		],
+		"name": "submitString",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "reclaimed",
-		"type": "event"
+		"name": "ubounties",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "numLeft",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint8",
+				"name": "numSubmissions",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint32",
+				"name": "hunterIndex",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint32",
+				"name": "creatorIndex",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint32",
+				"name": "bountyChestIndex",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint48",
+				"name": "deadline",
+				"type": "uint48"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "infoHash",
+				"type": "bytes32"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
 	}
 ]
 let uBCContract
@@ -1584,7 +1600,7 @@ async function initialize(web3){
 
 	orderbookContract = new ethers.Contract(orderbookAddress,orderbookABI,signer)
 
-	overrides = {}
+	//overrides = {gasLimit:800000}
 
 	await getBountyData()
 
@@ -1616,6 +1632,7 @@ async function getApproved(){
 
 async function getBountyData() {
 	ubounties = new Array()
+	bCToNumLeft = new Array()
 	let numUBounties = await uBCContract.numUbounties()
 	for(let o=0;o<numUBounties;o++){
 
@@ -1641,6 +1658,9 @@ async function getBountyData() {
 	}
 	ubounties.push(ubounty)
 
+	bCToNumLeft[ubounty.bountyChestIndex] = ubounty.numLeft
+
+
 }
 
 	creatorList = new Array()
@@ -1663,13 +1683,16 @@ async function getBountyData() {
 	for(let r=0;r<numBC;r++){
 		let bc = await uBCContract.bCList(r)
 		let tokenBalance = await tokenContract.balanceOf(bc)
+		if(r!=0){
+			tokenBalance = tokenBalance.div(bCToNumLeft[r])
+		}
 		tokenBalance = utils.formatUnits(tokenBalance,tokenDecimals)
 		tokenBalance = utils.commify(tokenBalance)
 		tokenBalance += " DEV"
 
 		let balanceLink = document.createElement("a")
 		balanceLink.innerText = tokenBalance
-		balanceLink.href = "https://ropsten.etherscan.io/address/" + bc
+		balanceLink.href = "https://etherscan.io/address/" + bc
 
 		bountyBalances.push(balanceLink)
 		bCList.push(bc)

@@ -8,8 +8,8 @@ async function create() {
 var timeFrame = e.options[e.selectedIndex].value;
   let time = document.getElementById("timeIntervalInput").value*timeFrame;
   console.log(hunter,name,description,time,amount)
-
-  await uBCContract.createSingleBounty(name,description,hunter,amount,overrides)
+  let deadline = utils.bigNumberify(0)
+  await uBCContract.createSingleBounty(name,description,hunter,amount,0)
 }
 
 function updateCreatorManager(){
@@ -165,7 +165,7 @@ async function reward(){
     gasLimit:400000
   }
   console.log(bountyId,submissionId)
-  await uBCContract.reward(bountyId,submissionId,overrides)
+  await uBCContract.reward(bountyId,submissionId)
 }
 
 async function submitString(ubountyIndex,submissionString){
