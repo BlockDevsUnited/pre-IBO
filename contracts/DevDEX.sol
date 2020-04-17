@@ -196,7 +196,6 @@ contract orderLevel {
         maxLoops= _maxLoops;
     }
 
-
 }
 
 contract orderbook{

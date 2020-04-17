@@ -16,7 +16,7 @@ async function populateOLTable(){
 
     let addressLink = document.createElement("a")
     addressLink.innerText = orderLevels[o].address
-    addressLink.href = "https://ropsten.etherscan.io/address/" + orderLevels[o].address
+    addressLink.href = "https://etherscan.io/address/" + orderLevels[o].address
          textnode1=document.createTextNode(price);
          textnode2=document.createTextNode(buys);
          cell1.appendChild(textnode1);

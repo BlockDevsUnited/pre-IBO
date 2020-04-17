@@ -39,7 +39,10 @@ document.getElementById("amountLabel").innerHTML = "Amount: "
   document.getElementById("nameLabel").innerHTML = "Name: " + ubounties[bountyId].name
   document.getElementById("descriptionLabel").innerHTML = "Description: " + ubounties[bountyId].description
   document.getElementById("amountLabel").appendChild(bountyBalances[bountyId])
-  document.getElementById("submissionLabel").innerHTML = "Submission: " + ubounties[bountyId].submissions[ubounties[bountyId].numSubmissions-1].submissionString
+  console.log(bountyId)
+  if(ubounties[bountyId].submissions.length>0){
+  document.getElementById("submissionLabel").innerHTML = "Submission: " + ubounties[bountyId].submissions[ubounties[bountyId].numSubmissions].submissionString
+}
   document.getElementById("deadlineLabel").innerHTML = "Deadline: none"
 }
 
@@ -160,7 +163,7 @@ async function submit() {
 
 async function reward(){
   let bountyId = document.getElementById("BountySelect").value-1;
-  let submissionId=(ubounties[bountyId].numSubmissions)-1
+  let submissionId=(ubounties[bountyId].numSubmissions)
   let overrides = {
     gasLimit:400000
   }

@@ -281,7 +281,7 @@ let tokenABI = [
 let tokenContract;
 
 //uBountyCreator
-let uBCAddress = "0xab3A3f3Df683513De7d060a045A01a13b811F422"//"0x1b111DB39178adC3Facf848f524dE18E0Ae427dE"
+	let uBCAddress = "0x30d4cc81425965D2C67a0ADD83252C5D30b4232C"//"0x7A5BEf5a5deF90f496c9859A993765Ae4D5BcE33"//"0xab3A3f3Df683513De7d060a045A01a13b811F422"//"0x1b111DB39178adC3Facf848f524dE18E0Ae427dE"
 let uBCABI = [
 	{
 		"inputs": [],
@@ -1543,8 +1543,7 @@ let OLABI = [
 		"payable": true,
 		"stateMutability": "payable",
 		"type": "fallback"
-	}
-] //orderLevel ABI
+	}] //orderLevel ABI
 let orderLevels
 
 async function initializeAdmin(web3){
@@ -1681,10 +1680,13 @@ async function getBountyData() {
 	bountyBalances = new Array()
 	let numBC = await uBCContract.numBC()
 	for(let r=0;r<numBC;r++){
+		console.log(r)
 		let bc = await uBCContract.bCList(r)
 		let tokenBalance = await tokenContract.balanceOf(bc)
 		if(r!=0){
-			tokenBalance = tokenBalance.div(bCToNumLeft[r])
+			if(!bCToNumLeft[r]==undefined){
+				tokenBalance = tokenBalance.div(bCToNumLeft[r])
+			}
 		}
 		tokenBalance = utils.formatUnits(tokenBalance,tokenDecimals)
 		tokenBalance = utils.commify(tokenBalance)
